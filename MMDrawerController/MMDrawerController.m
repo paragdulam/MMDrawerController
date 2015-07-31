@@ -81,11 +81,41 @@ static NSString *MMDrawerCenterKey = @"MMDrawerCenter";
 static NSString *MMDrawerOpenSideKey = @"MMDrawerOpenSide";
 
 @interface MMDrawerCenterContainerView : UIView
+@property (nonatomic,strong) UIView *overlayView;
 @property (nonatomic,assign) MMDrawerOpenCenterInteractionMode centerInteractionMode;
 @property (nonatomic,assign) MMDrawerSide openSide;
 @end
 
 @implementation MMDrawerCenterContainerView
+
+- (id)initWithFrame:(CGRect)frame
+{
+    if (self = [super initWithFrame:frame]) {
+        self.overlayView = [[UIView alloc] initWithFrame:self.bounds];
+        self.overlayView.alpha = 0.0f;
+        self.overlayView.backgroundColor = [UIColor blackColor];
+        [self addSubview:self.overlayView];
+    }
+    return self;
+}
+
+- (void)showOverlay
+{
+    self.overlayView.alpha = .7f;
+}
+
+- (void)hideOverlay
+{
+    self.overlayView.alpha = 0.f;
+}
+
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    [self bringSubviewToFront:self.overlayView];
+    self.overlayView.frame = self.bounds;
+}
 
 -(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
     UIView *hitView = [super hitTest:point withEvent:event];
@@ -336,6 +366,7 @@ static NSString *MMDrawerOpenSideKey = @"MMDrawerOpenSide";
          animations:^{
              [self setNeedsStatusBarAppearanceUpdateIfSupported];
              [self.centerContainerView setFrame:newFrame];
+             [self.centerContainerView hideOverlay];
              [self updateDrawerVisualStateForDrawerSide:visibleSide percentVisible:0.0];
          }
          completion:^(BOOL finished) {
@@ -396,6 +427,7 @@ static NSString *MMDrawerOpenSideKey = @"MMDrawerOpenSide";
                  [self setNeedsStatusBarAppearanceUpdateIfSupported];
                  [self.centerContainerView setFrame:newFrame];
                  [self updateDrawerVisualStateForDrawerSide:drawerSide percentVisible:1.0];
+                 [self.centerContainerView showOverlay];
              }
              completion:^(BOOL finished) {
                  //End the appearance transition if it already wasn't open.
