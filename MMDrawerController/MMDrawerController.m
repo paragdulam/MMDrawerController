@@ -1102,6 +1102,7 @@ static NSString *MMDrawerOpenSideKey = @"MMDrawerOpenSide";
         }
     }
     else {
+        [self.centerContainerView hideOverlay];
         if(completion){
             completion(NO);
         }
